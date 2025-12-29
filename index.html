@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To My Best Friend</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+    <style>
+        /* --- CSS STYLES --- */
+        :root {
+            --bg-color: #2c3e50;
+            --primary: #e74c3c;
+            --secondary: #f1c40f;
+            --accent: #3498db;
+            --text-color: #ecf0f1;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: radial-gradient(circle at center, #34495e, #2c3e50);
+            color: var(--text-color);
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* --- PAGE TRANSITIONS --- */
+        .page {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: opacity 1s ease, transform 1s ease;
+        }
+
+        .hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.9);
+            display: none; /* Fully hide to allow scrolling on page 2 */
+        }
+
+        /* --- PAGE 1: GIFT BOX --- */
+        #page1 {
+            justify-content: center;
+            z-index: 10;
+        }
+        
+        .gift-box {
+            font-size: 8rem;
+            cursor: pointer;
+            animation: bounce 2s infinite;
+            transition: transform 0.3s;
+        }
+        .gift-box:hover { transform: scale(1.1); }
+        .tap-text { margin-top: 10px; font-size: 1.2rem; opacity: 0.7; letter-spacing: 3px; }
+
+        /* --- PAGE 2: MAIN CONTENT --- */
+        #page2 {
+            overflow-y: auto; /* Enable scrolling */
+            padding-bottom: 50px;
+            display: block; /* Allows natural stacking of elements */
+            text-align: center;
+            opacity: 0; /* Starts invisible until JS activates it */
+        }
+
+        /* Header Style */
+        h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 4rem;
+            margin: 30px 0 10px 0;
+            background: linear-gradient(to right, var(--secondary), var(--primary));
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        /* --- SPEECH SECTION --- */
+        .speech-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 30px;
+            margin: 20px auto;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 85%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: left;
+        }
+
+        #typewriter-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            white-space: pre-wrap; /* Keeps formatting */
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 3px;
+            height: 1.2rem;
+            background-color: white;
+            animation: blink 1s infinite;
+        }
+
+        /* --- CAKE & CANDLE --- */
+        .cake-wrapper {
+            position: relative;
+            width: 200px;
+            height: 150px;
+            margin: 30px auto;
+            cursor: pointer;
+        }
+        .cake-base {
+            position: absolute; bottom: 0; width: 100%; height: 100px;
+            background: #e17055; border-radius: 10px 10px 0 0;
+        }
+        .cake-icing {
+            position: absolute; top: -10px; width: 100%; height: 30px;
+            background: #ffeaa7; border-radius: 15px;
+            box-shadow: 0 5px 0 rgba(0,0,0,0.1);
+        }
+        .candle {
+            position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%);
+            width: 15px; height: 50px; background: white;
+            background: repeating-linear-gradient(45deg, white, white 5px, #d63031 5px, #d63031 10px);
+        }
+        .flame {
+            position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+            width: 12px; height: 20px; background: orange; border-radius: 50%;
+            box-shadow: 0 0 10px yellow;
+            animation: flicker 0.2s infinite alternate;
+        }
+        .smoke {
+            position: absolute; top: -30px; left: 50%; width: 10px; height: 10px;
+            background: #aaa; border-radius: 50%; opacity: 0;
+        }
+
+        /* --- PHOTO GALLERY --- */
+        .gallery-container {
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;
+            margin: 30px auto; max-width: 800px;
+        }
+        .polaroid {
+            background: white; padding: 10px 10px 30px 10px;
+            color: #333; font-weight: bold;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.5);
+            transform: rotate(-3deg); transition: 0.3s;
+            width: 160px;
+        }
+        .polaroid:nth-child(even) { transform: rotate(3deg); }
+        .polaroid:hover { transform: scale(1.1) rotate(0deg); z-index: 5; }
+        .polaroid img { width: 100%; height: 150px; object-fit: cover; border: 1px solid #ccc; }
+
+        /* --- BALLOONS --- */
+        .balloon {
+            position: fixed; bottom: -100px; width: 40px; height: 55px;
+            border-radius: 50%; opacity: 0.8; z-index: 50;
+            animation: riseUp 10s linear infinite;
+        }
+        .balloon::after {
+            content: ''; position: absolute; bottom: -40px; left: 50%;
+            width: 1px; height: 40px; background: rgba(255,255,255,0.5);
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes bounce { 0%, 100% {transform: translateY(0);} 50% {transform: translateY(-20px);} }
+        @keyframes blink { 50% {opacity: 0;} }
+        @keyframes flicker { 0% {transform: translateX(-50%) scale(1);} 100% {transform: translateX(-50%) scale(1.2);} }
+        @keyframes riseUp { 100% {transform: translateY(-120vh) rotate(20deg);} }
+        @keyframes smokeRise { 100% {opacity: 0; transform: translateY(-50px);} }
+    </style>
+</head>
+<body>
+
+    <audio id="bg-music" loop>
+        <source src="index.mpeg" type="audio/mpeg">
+    </audio>
+
+    <div id="page1" class="page">
+        <div class="gift-box" onclick="startCelebration()">🎁</div>
+        <div class="tap-text">Tap to Open</div>
+    </div>
+
+    <div id="page2" class="page hidden">
+        <h1>Happy Birthday!</h1>
+
+        <div class="speech-container">
+            <span id="typewriter-text"></span><span class="cursor"></span>
+        </div>
+
+        <div class="cake-wrapper" onclick="blowCandle()">
+            <div class="candle">
+                <div class="flame" id="flame"></div>
+                <div class="smoke" id="smoke"></div>
+            </div>
+            <div class="cake-base"><div class="cake-icing"></div></div>
+        </div>
+        <p style="font-size: 0.8rem; color: #ccc;">(Make a wish and click the cake!)</p>
+
+        <div class="gallery-container">
+            <div class="polaroid">
+                <img src="index.jpyg" alt="Img1">
+                Crazy Times
+            </div>
+            <div class="polaroid">
+                <img src="index.jpg" alt="Img2">
+                Adventures
+            </div>
+            <div class="polaroid">
+                <img src="index.jpeg" alt="Img3">
+                Friends Forever
+            </div>
+        </div>
+    </div>
+
+    <div id="balloons-container"></div>
+
+    <script>
+        // --- THE SPEECH CONTENT ---
+        // You can edit the text inside the quotes below to customize the message.
+        const fullSpeech = `To my partner in crime and my favorite human,
+
+I don't say this enough, but you are truly special. You aren't just a friend; you are the family I got to choose. 
+
+Thank you for the late-night talks, the crazy adventures, and for laughing at my terrible jokes. Life is just better with you in it.
+
+I hope this year brings you as much happiness as you bring into my life. Keep shining, keep smiling, and know that I've always got your back.
+
+Happy Birthday, Bestie! ❤️`;
+
+        // --- FUNCTIONS ---
+
+        function startCelebration() {
+            // 1. Hide Page 1, Show Page 2
+            document.getElementById('page1').style.display = 'none';
+            const page2 = document.getElementById('page2');
+            page2.classList.remove('hidden');
+            page2.style.opacity = '1';
+
+            // 2. Play Music
+            const audio = document.getElementById('bg-music');
+            audio.play().catch(e => console.log("Audio requires interaction"));
+
+            // 3. Start Typewriter Effect
+            typeWriter();
+
+            // 4. Start Balloons
+            setInterval(createBalloon, 500);
+        }
+
+        // Typewriter Logic
+        let i = 0;
+        const speed = 50; // Speed of typing in milliseconds
+        function typeWriter() {
+            if (i < fullSpeech.length) {
+                document.getElementById("typewriter-text").innerHTML += fullSpeech.charAt(i);
+                i++;
+                setTimeout(typeWriter, speed);
+            } else {
+                // Stop the cursor blinking when done
+                document.querySelector('.cursor').style.display = 'none';
+            }
+        }
+
+        // Cake Logic
+        function blowCandle() {
+            const flame = document.getElementById('flame');
+            const smoke = document.getElementById('smoke');
+            
+            flame.style.display = 'none'; // Hide flame
+            smoke.style.opacity = '1'; 
+            smoke.style.animation = 'smokeRise 1s forwards'; // Show smoke
+            
+            // Change header text
+            document.querySelector('h1').innerText = "Cheers to You! 🥂";
+        }
+
+        // Balloon Logic
+        function createBalloon() {
+            const container = document.getElementById('balloons-container');
+            const colors = ['#e74c3c', '#3498db', '#f1c40f', '#9b59b6', '#2ecc71'];
+            const balloon = document.createElement('div');
+            
+            balloon.classList.add('balloon');
+            balloon.style.left = Math.random() * 100 + 'vw';
+            balloon.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            balloon.style.animationDuration = (Math.random() * 5 + 5) + 's';
+            
+            container.appendChild(balloon);
+
+            // Clean up balloon after it floats away to keep website fast
+            setTimeout(() => {
+                balloon.remove();
+            }, 10000);
+        }
+    </script>
+</body>
+</html>
